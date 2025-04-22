@@ -1,9 +1,4 @@
 import { useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -12,7 +7,7 @@ import Footer from "@/components/Footer";
 import TireSelector from "@/components/TireSelector";
 import ProductCard from "@/components/ProductCard";
 import { Badge } from "@/components/ui/badge";
-import { Truck, Clock, CreditCard, Award, ChevronRight } from "lucide-react";
+import { Truck, Clock, CreditCard, Award, ChevronRight, ChevronLeft } from "lucide-react";
 
 // Временные данные для примера
 const popularTires = [
@@ -128,6 +123,71 @@ const banners = [
   }
 ];
 
+const BannerSlider = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+  };
+  
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+  };
+
+  return (
+    <div className="relative rounded-lg overflow-hidden h-[300px] md:h-[400px]">
+      {banners.map((banner, index) => (
+        <div 
+          key={banner.id} 
+          className={`absolute inset-0 transition-opacity duration-500 ${
+            index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <img 
+            src={banner.image}
+            alt={banner.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex flex-col justify-center px-8 md:px-12">
+            <h2 className="text-white text-2xl md:text-4xl font-bold mb-2">{banner.title}</h2>
+            <p className="text-white text-lg md:text-xl mb-6">{banner.subtitle}</p>
+            <Button className="w-fit">{banner.btnText}</Button>
+          </div>
+        </div>
+      ))}
+      
+      <div className="absolute inset-x-0 bottom-4 flex justify-center space-x-2">
+        {banners.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`w-3 h-3 rounded-full ${
+              index === currentSlide ? "bg-white" : "bg-white/50"
+            }`}
+            aria-label={`Перейти к слайду ${index + 1}`}
+          />
+        ))}
+      </div>
+      
+      <button
+        onClick={prevSlide}
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 transition-colors"
+        aria-label="Предыдущий слайд"
+      >
+        <ChevronLeft className="h-6 w-6" />
+      </button>
+      
+      <button
+        onClick={nextSlide}
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 transition-colors"
+        aria-label="Следующий слайд"
+      >
+        <ChevronRight className="h-6 w-6" />
+      </button>
+    </div>
+  );
+};
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState("tires");
 
@@ -141,35 +201,7 @@ const Index = () => {
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
-                <Swiper
-                  spaceBetween={30}
-                  centeredSlides={true}
-                  autoplay={{
-                    delay: 5000,
-                    disableOnInteraction: false,
-                  }}
-                  pagination={{
-                    clickable: true,
-                  }}
-                  navigation={true}
-                  modules={[Autoplay, Pagination, Navigation]}
-                  className="rounded-lg overflow-hidden h-[300px] md:h-[400px]"
-                >
-                  {banners.map((banner) => (
-                    <SwiperSlide key={banner.id} className="relative">
-                      <img 
-                        src={banner.image}
-                        alt={banner.title}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex flex-col justify-center px-8 md:px-12">
-                        <h2 className="text-white text-2xl md:text-4xl font-bold mb-2">{banner.title}</h2>
-                        <p className="text-white text-lg md:text-xl mb-6">{banner.subtitle}</p>
-                        <Button className="w-fit">{banner.btnText}</Button>
-                      </div>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
+                <BannerSlider />
               </div>
               <div>
                 <TireSelector />
